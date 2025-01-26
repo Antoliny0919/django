@@ -23,6 +23,7 @@ from django.contrib.admin.utils import (
     construct_change_message,
     flatten_fieldsets,
     get_deleted_objects,
+    get_object_display_name,
     lookup_spawns_duplicates,
     model_format_dict,
     model_ngettext,
@@ -1382,7 +1383,9 @@ class ModelAdmin(BaseModelAdmin):
         )
         # Add a link to the object's change form if the user can edit the obj.
         if self.has_change_permission(request, obj):
-            obj_repr = format_html('<a href="{}">{}</a>', urlquote(obj_url), obj)
+            obj_repr = format_html(
+                '<a href="{}">{}</a>', urlquote(obj_url), get_object_display_name(obj)
+            )
         else:
             obj_repr = str(obj)
         msg_dict = {
@@ -1507,7 +1510,11 @@ class ModelAdmin(BaseModelAdmin):
 
         msg_dict = {
             "name": opts.verbose_name,
-            "obj": format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
+            "obj": format_html(
+                '<a href="{}">{}</a>',
+                urlquote(request.path),
+                get_object_display_name(obj),
+            ),
         }
         if "_continue" in request.POST:
             msg = format_html(

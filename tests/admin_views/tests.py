@@ -6859,6 +6859,72 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
 
+    def test_object_string_is_blank(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        obj = CoverLetter.objects.create(author="      ")
+        change_url = reverse("admin:admin_views_coverletter_change", args=(obj.pk,))
+        # Breadcrumbs
+        delete_url = reverse("admin:admin_views_coverletter_delete", args=(obj.pk,))
+        self.selenium.get(self.live_server_url + delete_url)
+        selector = 'nav[aria-label="Breadcrumbs"] a[href="%s"]' % change_url
+        breadcrumbs_obj = self.selenium.find_element(By.CSS_SELECTOR, selector)
+        self.assertEqual(breadcrumbs_obj.text, "-")
+        history_url = reverse("admin:admin_views_coverletter_history", args=(obj.pk,))
+        self.selenium.get(self.live_server_url + history_url)
+        breadcrumbs_obj = self.selenium.find_element(By.CSS_SELECTOR, selector)
+        self.assertEqual(breadcrumbs_obj.text, "-")
+        # Delete Confirmation
+        self.selenium.get(self.live_server_url + delete_url)
+        delete_obj = self.selenium.find_element(
+            By.CSS_SELECTOR, 'ul#deleted-objects a[href="%s"]' % change_url
+        )
+        self.assertEqual(delete_obj.text, "-")
+        # Index Recent Actions
+        LogEntry.objects.log_actions(
+            user_id=self.superuser.pk,
+            queryset=[obj],
+            action_flag=ADDITION,
+            change_message=[],
+            single_object=True,
+        )
+        index_url = reverse("admin:index")
+        self.selenium.get(self.live_server_url + index_url)
+        action_list = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            "div#recent-actions-module.module ul.actionlist "
+            'a[href="%s"]' % change_url,
+        )
+        self.assertEqual(action_list.text, "-")
+        # Message
+        self.selenium.get(self.live_server_url + change_url)
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        message = self.selenium.find_element(
+            By.CSS_SELECTOR, "ul.messagelist li.success"
+        )
+        self.assertHTMLEqual(
+            message.get_attribute("innerHTML"),
+            'The cover letter “<a href="%s">-</a>” '
+            "was changed successfully." % change_url,
+        )
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_coverletter_add")
+        )
+        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        new_obj = CoverLetter.objects.latest("id")
+        message = self.selenium.find_element(
+            By.CSS_SELECTOR, "ul.messagelist li.success"
+        )
+        self.assertHTMLEqual(
+            message.get_attribute("innerHTML"),
+            'The cover letter “<a href="%s">-</a>” '
+            "was added successfully."
+            % reverse("admin:admin_views_coverletter_change", args=(new_obj.id,)),
+        )
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):

@@ -162,7 +162,10 @@ def get_deleted_objects(objs, request, admin_site):
 
             # Display a link to the admin page.
             return format_html(
-                '{}: <a href="{}">{}</a>', capfirst(opts.verbose_name), admin_url, obj
+                '{}: <a href="{}">{}</a>',
+                capfirst(opts.verbose_name),
+                admin_url,
+                get_object_display_name(obj),
             )
         else:
             # Don't display link to edit, because it either has no
@@ -484,6 +487,12 @@ def display_for_value(value, empty_value_display, boolean=False):
         return ", ".join(str(v) for v in value)
     else:
         return str(value)
+
+
+def get_object_display_name(obj):
+    if str(obj).strip() == "":
+        return "-"
+    return obj
 
 
 class NotRelationField(Exception):
