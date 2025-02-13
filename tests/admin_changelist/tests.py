@@ -515,7 +515,7 @@ class ChangeListTests(TestCase):
 
         cl = m.get_changelist_instance(request)
         cl.get_results(request)
-        self.assertIsInstance(cl.paginator, CustomPaginator)
+        self.assertIsInstance(cl.pagination.paginator, CustomPaginator)
 
     def test_distinct_for_m2m_in_list_filter(self):
         """
@@ -936,15 +936,15 @@ class ChangeListTests(TestCase):
         m = ChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 60)
-        self.assertEqual(cl.paginator.count, 60)
-        self.assertEqual(list(cl.paginator.page_range), [1, 2, 3, 4, 5, 6])
+        self.assertEqual(cl.pagination.paginator.count, 60)
+        self.assertEqual(list(cl.pagination.paginator.page_range), [1, 2, 3, 4, 5, 6])
 
         # Test custom queryset
         m = FilteredChildAdmin(Child, custom_site)
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 30)
-        self.assertEqual(cl.paginator.count, 30)
-        self.assertEqual(list(cl.paginator.page_range), [1, 2, 3])
+        self.assertEqual(cl.pagination.paginator.count, 30)
+        self.assertEqual(list(cl.pagination.paginator.page_range), [1, 2, 3])
 
     def test_computed_list_display_localization(self):
         """
@@ -1674,7 +1674,7 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         cl.list_per_page = 10
 
-        ELLIPSIS = cl.paginator.ELLIPSIS
+        ELLIPSIS = cl.pagination.paginator.ELLIPSIS
         for number, pages, expected in [
             (1, 1, []),
             (1, 2, [1, 2]),
@@ -1693,11 +1693,12 @@ class ChangeListTests(TestCase):
                 Group.objects.all().delete()
                 for i in range(pages * cl.list_per_page):
                     Group.objects.create(name="test band")
-
                 # setting page number and calculating page range
-                cl.page_num = number
                 cl.get_results(request)
-                self.assertEqual(list(pagination(cl)["page_range"]), expected)
+                cl.pagination.page_num = number
+                self.assertEqual(
+                    list(pagination(cl.pagination)["page_range"]), expected
+                )
 
     def test_object_tools_displayed_no_add_permission(self):
         """

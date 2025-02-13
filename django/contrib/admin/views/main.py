@@ -18,6 +18,7 @@ from django.contrib.admin.options import (
 from django.contrib.admin.utils import (
     build_q_object_from_lookup_parameters,
     get_fields_from_path,
+    get_query_string,
     lookup_spawns_duplicates,
     prepare_lookup_value,
     quote,
@@ -32,7 +33,6 @@ from django.db.models import F, Field, ManyToOneRel, OrderBy
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Combinable
 from django.urls import reverse
-from django.utils.http import urlencode
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext
 
@@ -94,9 +94,9 @@ class ChangeList:
         self.clear_all_filters_qs = None
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
-        self.list_select_related = list_select_related
         self.list_per_page = list_per_page
         self.list_max_show_all = list_max_show_all
+        self.list_select_related = list_select_related
         self.model_admin = model_admin
         self.preserved_filters = model_admin.get_preserved_filters(request)
         self.sortable_by = sortable_by
@@ -108,11 +108,6 @@ class ChangeList:
             for error in _search_form.errors.values():
                 messages.error(request, ", ".join(error))
         self.query = _search_form.cleaned_data.get(SEARCH_VAR) or ""
-        try:
-            self.page_num = int(request.GET.get(PAGE_VAR, 1))
-        except ValueError:
-            self.page_num = 1
-        self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
         self.add_facets = model_admin.show_facets is ShowFacets.ALWAYS or (
             model_admin.show_facets is ShowFacets.ALLOW and IS_FACETS_VAR in request.GET
@@ -132,8 +127,12 @@ class ChangeList:
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
             del self.filter_params[ERROR_FLAG]
-        self.remove_facet_link = self.get_query_string(remove=[IS_FACETS_VAR])
-        self.add_facet_link = self.get_query_string({IS_FACETS_VAR: True})
+        self.remove_facet_link = get_query_string(
+            self.filter_params, remove=[IS_FACETS_VAR]
+        )
+        self.add_facet_link = get_query_string(
+            self.filter_params, {IS_FACETS_VAR: True}
+        )
 
         if self.is_popup:
             self.list_editable = ()
@@ -274,31 +273,15 @@ class ChangeList:
         except FieldDoesNotExist as e:
             raise IncorrectLookupParameters(e) from e
 
-    def get_query_string(self, new_params=None, remove=None):
-        if new_params is None:
-            new_params = {}
-        if remove is None:
-            remove = []
-        p = self.filter_params.copy()
-        for r in remove:
-            for k in list(p):
-                if k.startswith(r):
-                    del p[k]
-        for k, v in new_params.items():
-            if v is None:
-                if k in p:
-                    del p[k]
-            else:
-                p[k] = v
-        return "?%s" % urlencode(sorted(p.items()), doseq=True)
-
     def get_results(self, request):
-        paginator = self.model_admin.get_paginator(
-            request, self.queryset, self.list_per_page
+        pagination = Pagination(
+            request,
+            self.model,
+            self.list_per_page,
+            self.list_max_show_all,
+            self.queryset,
+            self.model_admin,
         )
-        # Get the number of objects, with admin filters applied.
-        result_count = paginator.count
-
         # Get the total number of objects, with no admin filters applied.
         # Note this isn't necessarily the same as result_count in the case of
         # no filtering. Filters defined in list_filters may still apply some
@@ -307,19 +290,6 @@ class ChangeList:
             full_result_count = self.root_queryset.count()
         else:
             full_result_count = None
-        can_show_all = result_count <= self.list_max_show_all
-        multi_page = result_count > self.list_per_page
-
-        # Get the list of objects to display on this page.
-        if (self.show_all and can_show_all) or not multi_page:
-            result_list = self.queryset._clone()
-        else:
-            try:
-                result_list = paginator.page(self.page_num).object_list
-            except InvalidPage:
-                raise IncorrectLookupParameters
-
-        self.result_count = result_count
         self.show_full_result_count = self.model_admin.show_full_result_count
         # Admin actions are shown if there is at least one entry
         # or if entries are not counted because show_full_result_count is disabled
@@ -327,10 +297,9 @@ class ChangeList:
             full_result_count
         )
         self.full_result_count = full_result_count
-        self.result_list = result_list
-        self.can_show_all = can_show_all
-        self.multi_page = multi_page
-        self.paginator = paginator
+        self.pagination = pagination
+        self.result_list = pagination.get_objects()
+        self.result_count = pagination.result_count
 
     def _get_default_ordering(self):
         ordering = []
@@ -574,7 +543,8 @@ class ChangeList:
         )
 
         # Set query string for clearing all filters.
-        self.clear_all_filters_qs = self.get_query_string(
+        self.clear_all_filters_qs = get_query_string(
+            self.filter_params,
             new_params=remaining_lookup_params,
             remove=self.get_filters_params(),
         )
@@ -616,3 +586,44 @@ class ChangeList:
             args=(quote(pk),),
             current_app=self.model_admin.admin_site.name,
         )
+
+
+class Pagination:
+    def __init__(
+        self,
+        request,
+        model,
+        list_per_page,
+        list_max_show_all,
+        queryset,
+        model_admin,
+    ):
+        self.model = model
+        self.opts = model._meta
+        self.list_per_page = list_per_page
+        self.list_max_show_all = list_max_show_all
+        self.model_admin = model_admin
+        try:
+            self.page_num = int(request.GET.get(PAGE_VAR, 1))
+        except ValueError:
+            self.page_num = 1
+        self.show_all = ALL_VAR in request.GET
+        self.filter_params = dict(request.GET.items())
+        self.queryset = queryset
+        paginator = self.model_admin.get_paginator(
+            request, self.queryset, self.list_per_page
+        )
+        self.result_count = paginator.count
+        self.can_show_all = self.result_count <= self.list_max_show_all
+        self.multi_page = self.result_count > self.list_per_page
+        self.paginator = paginator
+
+    def get_objects(self):
+        if (self.show_all and self.can_show_all) or not self.multi_page:
+            result_list = self.queryset._clone()
+        else:
+            try:
+                result_list = self.paginator.page(self.page_num).object_list
+            except InvalidPage:
+                raise IncorrectLookupParameters
+        return result_list

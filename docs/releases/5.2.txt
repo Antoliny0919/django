@@ -138,6 +138,10 @@ Minor features
 
 * The value of a :class:`~django.db.models.URLField` now renders as a link.
 
+* The :attr:`~django.contrib.admin.ModelAdmin.list_per_page` and
+  :attr:`~django.contrib.admin.ModelAdmin.list_max_show_all` attributes
+  now apply to history page pagination in addition to change list page.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
