@@ -1,5 +1,5 @@
-<svg width="14" height="84" viewBox="0 0 512 3072" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+<svg width="14" height="84" viewBox="0 0 640 3840" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
   <defs>
     <g id="sort">
       <!--
@@ -7,7 +7,7 @@
         Icon Family: classic
         Icon Style: solid
       -->
-      <path d="M137.4 41.4c12.5-12.5 32.8-12.5 45.3 0l128 128c9.2 9.2 11.9 22.9 6.9 34.9s-16.6 19.8-29.6 19.8L32 224c-12.9 0-24.6-7.8-29.6-19.8s-2.2-25.7 6.9-34.9l128-128zm0 429.3l-128-128c-9.2-9.2-11.9-22.9-6.9-34.9s16.6-19.8 29.6-19.8l256 0c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-128 128c-12.5 12.5-32.8 12.5-45.3 0z"/>
+      <path d="M130.4 268.2C135.4 280.2 147 288 160 288L480 288C492.9 288 504.6 280.2 509.6 268.2C514.6 256.2 511.8 242.5 502.7 233.3L342.7 73.3C330.2 60.8 309.9 60.8 297.4 73.3L137.4 233.3C128.2 242.5 125.5 256.2 130.5 268.2zM130.4 371.7C125.4 383.7 128.2 397.4 137.3 406.6L297.3 566.6C309.8 579.1 330.1 579.1 342.6 566.6L502.6 406.6C511.8 397.4 514.5 383.7 509.5 371.7C504.5 359.7 492.9 352 480 352L160 352C147.1 352 135.4 359.8 130.4 371.8z"/>
     </g>
     <g id="ascending">
       <!--
@@ -15,7 +15,7 @@
         Icon Family: classic
         Icon Style: solid
       -->
-      <path d="M182.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8l256 0c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/>
+      <path d="M160 288C147.1 288 135.4 280.2 130.4 268.2C125.4 256.2 128.2 242.5 137.4 233.4L297.4 73.4C309.9 60.9 330.2 60.9 342.7 73.4L502.7 233.4C511.9 242.6 514.6 256.3 509.6 268.3C504.6 280.3 492.9 288 480 288L160 288z"/>
     </g>
     <g id="descending">
       <!--
@@ -23,13 +23,13 @@
         Icon Family: classic
         Icon Style: solid
       -->
-      <path d="M182.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-9.2-9.2-11.9-22.9-6.9-34.9s16.6-19.8 29.6-19.8l256 0c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-128 128z"/>
+      <path d="M160 352C147.1 352 135.4 359.8 130.4 371.8C125.4 383.8 128.2 397.5 137.4 406.6L297.4 566.6C309.9 579.1 330.2 579.1 342.7 566.6L502.7 406.6C511.9 397.4 514.6 383.7 509.6 371.7C504.6 359.7 492.9 352 480 352L160 352z"/>
     </g>
   </defs>
   <use xlink:href="#sort" x="0" y="0" fill="#999999" />
-  <use xlink:href="#sort" x="0" y="512" fill="#447e9b" />
-  <use xlink:href="#ascending" x="0" y="1024" fill="#999999" />
-  <use xlink:href="#ascending" x="0" y="1536" fill="#447e9b" />
-  <use xlink:href="#descending" x="0" y="2048" fill="#999999" />
-  <use xlink:href="#descending" x="0" y="2560" fill="#447e9b" />
+  <use xlink:href="#sort" x="0" y="640" fill="#447e9b" />
+  <use xlink:href="#ascending" x="0" y="1280" fill="#999999" />
+  <use xlink:href="#ascending" x="0" y="1920" fill="#447e9b" />
+  <use xlink:href="#descending" x="0" y="2560" fill="#999999" />
+  <use xlink:href="#descending" x="0" y="3200" fill="#447e9b" />
 </svg>
