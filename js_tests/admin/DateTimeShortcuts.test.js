@@ -56,4 +56,20 @@ QUnit.test('time zone offset warning - date and time field', function(assert) {
     DateTimeShortcuts.init();
     $('body').attr('data-admin-utc-offset', savedOffset);
     assert.equal($('.timezonewarning').attr("id"), "id_updated_at_timezone_warning_helptext");
+    assert.ok($('.timezonewarning').next().is('p.datetime'));
+});
+
+QUnit.test('time zone warning text position with error list', function(assert) {
+    const $ = django.jQuery;
+    const savedOffset = $('body').attr('data-admin-utc-offset');
+    const dateTimeField = '<ul class="errorlist"><li>This field is required.</li></ul>' +
+    '<p class="datetime">' +
+    '<input id="id_updated_at_0" type="text" name="updated_at_0" class="vDateField">' +
+    '<input id="id_updated_at_1" type="text" name="updated_at_1" class="vTimeField">' +
+    '</p>';
+    $('#qunit-fixture').append($(dateTimeField));
+    $('body').attr('data-admin-utc-offset', new Date().getTimezoneOffset() * -60 + 3600);
+    DateTimeShortcuts.init();
+    $('body').attr('data-admin-utc-offset', savedOffset);
+    assert.ok($('.timezonewarning').next().is('ul.errorlist'));
 });
