@@ -1222,7 +1222,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         warning = warnings[0]
         self.assertTrue(warning.is_displayed())
         next_element = warning.find_element(By.XPATH, "./following-sibling::*[1]")
-        # Warning message are generally located just above the field block.
+        # Warning messages are generally located just above the field block.
         self.assertEqual(next_element, datetime)
 
         date = datetime.find_element(By.TAG_NAME, "input")
