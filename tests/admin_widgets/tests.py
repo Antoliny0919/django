@@ -1215,7 +1215,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
         datetime = self.selenium.find_element(By.CSS_SELECTOR, "p.datetime")
         warnings = self.selenium.find_elements(
-            By.CSS_SELECTOR, "div.form-row.field-birthdate div.help.timezonewarning"
+            By.CSS_SELECTOR, "div.field-birthdate div.timezonewarning"
         )
         self.assertEqual(len(warnings), 1)
 
