@@ -20,6 +20,7 @@
 
 .form-row select option:checked {
     background-color: var(--selected-row);
+    color: var(--body-fg);
 }
 
 form .form-row p {
@@ -187,10 +188,6 @@ form .aligned textarea + div.help,
 form .aligned select + div.help {
     margin-left: 160px;
     padding-left: 10px;
-}
-
-form .aligned select option:checked {
-    color: var(--body-fg);
 }
 
 form .aligned ul li {
