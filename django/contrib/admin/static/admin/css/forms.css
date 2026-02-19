@@ -108,11 +108,6 @@ fieldset .inline-heading,
 
 .aligned legend {
     float: inline-start;
-}
-
-.aligned legend,
-.aligned label {
-    display: block;
     padding: 0.5rem 0;
 }
 
