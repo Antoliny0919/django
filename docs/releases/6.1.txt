@@ -388,6 +388,12 @@ backends.
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
 
+:mod:`django.contrib.admin`
+---------------------------
+
+* The ``wide`` class has been removed, as it was made obsolete by the
+  new admin layout.
+
 System checks
 -------------
 
