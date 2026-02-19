@@ -435,6 +435,9 @@ Miscellaneous
   primary key when a ``QuerySet``'s ordering has been forcibly cleared by
   calling :meth:`~.QuerySet.order_by` with no arguments.
 
+:mod:`django.contrib.admin`
+---------------------------
+
 * In order to improve accessibility of the admin change forms:
 
   * Form fields are now shown below their respective labels instead of next to
